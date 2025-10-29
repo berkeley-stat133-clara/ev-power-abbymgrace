@@ -13,13 +13,6 @@ I used the data that was provided in the data file and kept on the row which has
 ## **Part 0: libraries**
 
 ```{r}
-install.packages("dplyr")
-install.packages("readr")
-install.packages("ggplot2")
-install.packages('tibble')
-install.packages('stringr')
-install.packages('tidyr')
-install.packages('usmap')
 library(dplyr)
 library(readr)
 library(ggplot2)
@@ -119,3 +112,18 @@ The map shows the total renewable energy use by state in 2023. The lighter shade
 I noticed that states with the largest total renewable energy in 2023 were California and Texas.
 Many states show increase in renewable energy from 2021 to 2023 by the bar chart, which is a good sign!
 I think the map helps us visualize the comparison per state easier than the bar chart. The bar chart you have to look at the numbers as well as the states and compare the different bar sizes per year, which can be difficult to do. 
+
+Here are my plots
+```{r}
+ggplot(renewable_energy_all, aes(x = state, y = renew_use, fill = factor(year))) + 
+    geom_col() + 
+    theme_minimal() + 
+    labs(title = "Renewable Energy Use by State 2021-2023", x = 'State', y = 'Total Renewable Energy') + 
+    theme(
+        axis.text.x = element_text(angle = 60, hjust = 1, size = 7), 
+        plot.title = element_text(hjust = 0.5, face = "bold"))
+
+plot_usmap(data = filter(renewable_energy_all, year == 2023) |>
+    mutate(state = toupper(state)), values = 'renew_use', regions = "states") + 
+    labs(title = "Renewable Energy Use by State (2023)", fill = "Total Use")
+```
