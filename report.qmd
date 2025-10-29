@@ -8,16 +8,30 @@ format: typst
 ## **Part 0: libraries**
 
 ```{r}
-
+install.packages("dplyr")
+install.packages("readr")
+install.packages("ggplot2")
+install.packages('tibble')
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(tibble)
 ```
 
 ## **Part 1:** **Defining Research Question**
 
-Chosen Question:
+Chosen Question: How has the total use of renewable energy changed from 2021-2023 per state?
 
 ## **Part 2: Data Preparation and Cleaning**
 
 ```{r}
+#load files 
+use21 <- read_csv('/Users/abbygrace/Desktop/stat133/ev-power-abbymgrace/data/total-use-2021.csv')
+use22 <- read_csv('/Users/abbygrace/Desktop/stat133/ev-power-abbymgrace/data/total-use-2022.csv')
+use23 <- read_csv('/Users/abbygrace/Desktop/stat133/ev-power-abbymgrace/data/total-use-2021.csv')
+
+#change row with total renewable energy name to be consistent
+
 
 ```
 
