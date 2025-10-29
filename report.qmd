@@ -1,9 +1,14 @@
 ---
-title: "EV Power - Lab 4 Project Report"
+title: "Abby Grace: Renewable Energy by U.S. States (2021-2023)"
 format: typst
 ---
 
 # Example Solution 1
+
+## **Overview**
+I looked at how the total energy use has changed accross all of the U.S. states from the years 2021 to 2023. 
+I used the data that was provided in the data file and kept on the row which has the total renewable energy row for each year in all three of the different csv's. I also reshaped the data to a tibble containing all three years and all states for the total renewable energy use. The new tibble has three columns 'state', 'renew_use', and 'year'. 
+
 
 ## **Part 0: libraries**
 
@@ -13,11 +18,15 @@ install.packages("readr")
 install.packages("ggplot2")
 install.packages('tibble')
 install.packages('stringr')
+install.packages('tidyr')
+install.packages('usmap')
 library(dplyr)
 library(readr)
 library(ggplot2)
 library(tibble)
 library(stringr)
+library(tidyr)
+library(usmap)
 ```
 
 ## **Part 1:** **Defining Research Question**
@@ -30,7 +39,7 @@ Chosen Question: How has the total renewable energy use changed from 2021-2023 a
 #load files 
 use21 <- read_csv('/Users/abbygrace/Desktop/stat133/ev-power-abbymgrace/data/total-use-2021.csv')
 use22 <- read_csv('/Users/abbygrace/Desktop/stat133/ev-power-abbymgrace/data/total-use-2022.csv')
-use23 <- read_csv('/Users/abbygrace/Desktop/stat133/ev-power-abbymgrace/data/total-use-2021.csv')
+use23 <- read_csv('/Users/abbygrace/Desktop/stat133/ev-power-abbymgrace/data/total-use-2023.csv')
 
 #need to make the column nanmes the same
 use21 <- use21 |> rename_with(~ str_replace_all(tolower(.x), " ", "_"))
@@ -58,19 +67,55 @@ head(use23)
 ```{r}
 #now we want to add all 3 years in one table
 #now we want to keep the row which is named "total_renewable_energy" and make our table longer 
-#we can use a function to apply this to all three tables to gather the needed information
 #we want the state, the total renewable energy use 
 
-func <- function(df, year) {
-    df |> 
-        filter(energy_source == "total_renewable_energy") |>
-        select(energy_source == "total_renewable_energy") |>
-        pivot_longer(cols = )
-}
+
+renewable21 <- use21 |>
+    filter(energy_source == "total_renewable_energy") |>
+    pivot_longer(cols = - energy_source, names_to = "state", values_to = "renewable energy use") |>
+    mutate(year = 2021)
+
+renewable22 <- use22 |>
+    filter(energy_source == "total_renewable_energy") |>
+    pivot_longer(cols = - energy_source, names_to = "state", values_to = "renewable energy use") |>
+    mutate(year = 2022)
+
+renewable23 <- use23 |>
+    filter(energy_source == "total_renewable_energy") |>
+    pivot_longer(cols = - energy_source, names_to = "state", values_to = "renewable energy use") |>
+    mutate(year = 2023)
+
+renewable_energy_all <- bind_rows(renewable21, renewable22, renewable23) 
+
+renewable_energy_all <- renewable_energy_all |>
+    filter(state != "us") |>
+    select(-energy_source) |>
+    rename(renew_use = 'renewable energy use') 
+
+head(renewable_energy_all)
+
 ```
 
 ## **Part 4: Mapping Visualization**
 
 ```{r}
+ggplot(renewable_energy_all, aes(x = state, y = renew_use, fill = factor(year))) + 
+    geom_col() + 
+    theme_minimal() + 
+    labs(title = "Renewable Energy Use by State 2021-2023", x = 'State', y = 'Total Renewable Energy') + 
+    theme(
+        axis.text.x = element_text(angle = 60, hjust = 1, size = 7), 
+        plot.title = element_text(hjust = 0.5, face = "bold"))
+
+plot_usmap(data = filter(renewable_energy_all, year == 2023) |>
+    mutate(state = toupper(state)), values = 'renew_use', regions = "states") + 
+    labs(title = "Renewable Energy Use by State (2023)", fill = "Total Use")
 
 ```
+
+## **Part 5: Final Deliverable**
+The map shows the total renewable energy use by state in 2023. The lighter shade of blue indicates more usage while the darker shade shows less use. I also added a bar chart which shows the total renewable energy across all U.S. states per year. 
+
+I noticed that states with the largest total renewable energy in 2023 were California and Texas.
+Many states show increase in renewable energy from 2021 to 2023 by the bar chart, which is a good sign!
+I think the map helps us visualize the comparison per state easier than the bar chart. The bar chart you have to look at the numbers as well as the states and compare the different bar sizes per year, which can be difficult to do. 
