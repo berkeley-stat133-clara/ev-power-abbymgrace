@@ -12,15 +12,17 @@ install.packages("dplyr")
 install.packages("readr")
 install.packages("ggplot2")
 install.packages('tibble')
+install.packages('stringr')
 library(dplyr)
 library(readr)
 library(ggplot2)
 library(tibble)
+library(stringr)
 ```
 
 ## **Part 1:** **Defining Research Question**
 
-Chosen Question: How has the total use of renewable energy changed from 2021-2023 per state?
+Chosen Question: How has the total renewable energy use changed from 2021-2023 across U.S. states?
 
 ## **Part 2: Data Preparation and Cleaning**
 
@@ -30,15 +32,41 @@ use21 <- read_csv('/Users/abbygrace/Desktop/stat133/ev-power-abbymgrace/data/tot
 use22 <- read_csv('/Users/abbygrace/Desktop/stat133/ev-power-abbymgrace/data/total-use-2022.csv')
 use23 <- read_csv('/Users/abbygrace/Desktop/stat133/ev-power-abbymgrace/data/total-use-2021.csv')
 
-#change row with total renewable energy name to be consistent
+#need to make the column nanmes the same
+use21 <- use21 |> rename_with(~ str_replace_all(tolower(.x), " ", "_"))
+use22 <- use22 |> rename_with(~ str_replace_all(tolower(.x), " ", "_"))
+use23 <- use23 |> rename_with(~ str_replace_all(tolower(.x), " ", "_"))
 
+#make all energy source names consistently lowercase
+use21$energy_source <- tolower(use21$energy_source)
+use22$energy_source <- tolower(use22$energy_source)
+use23$energy_source <- tolower(use23$energy_source)
 
+#now use regular expressions to make all consistent
+use21$energy_source <- str_replace_all(use21$energy_source, "total.*renew.*", "total_renewable_energy")
+use22$energy_source <- str_replace_all(use22$energy_source, "total.*renew.*", "total_renewable_energy")
+use23$energy_source <- str_replace_all(use23$energy_source, "total.*renew.*", "total_renewable_energy")
+
+#check they all look the same
+head(use21)
+head(use22)
+head(use23)
 ```
 
 ## **Part 3: Joining / Pivoting Datasets for Analysis**
 
 ```{r}
+#now we want to add all 3 years in one table
+#now we want to keep the row which is named "total_renewable_energy" and make our table longer 
+#we can use a function to apply this to all three tables to gather the needed information
+#we want the state, the total renewable energy use 
 
+func <- function(df, year) {
+    df |> 
+        filter(energy_source == "total_renewable_energy") |>
+        select(energy_source == "total_renewable_energy") |>
+        pivot_longer(cols = )
+}
 ```
 
 ## **Part 4: Mapping Visualization**
